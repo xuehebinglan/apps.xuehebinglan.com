@@ -3,15 +3,24 @@
 import Vue from 'vue'
 import App from './App'
 import router from './router'
-// import { Button, Select, Input } from 'iview'
-import iView from 'iview'
-import 'iview/dist/styles/iview.css'
+import ElementUI from 'element-ui'
+// import { Button, Input, InputNumber, Dialog, Loading, Message, MessageBox } from 'element-ui'
+import 'element-ui/lib/theme-chalk/index.css'
+import axios from 'axios'
 
 Vue.config.productionTip = false
-Vue.use(iView)
-// Vue.component('Button', Button)
-// Vue.component('Table', Table)
-// Vue.component('Input', Input)
+Vue.use(ElementUI)
+// Vue.use(Button)
+// Vue.use(InputNumber)
+// Vue.use(Input)
+// Vue.use(Dialog)
+// Vue.use(Loading)
+// Vue.use(Message)
+// Vue.use(MessageBox)
+
+// Vue.use(axios)
+
+Vue.prototype.$axios = axios
 
 /* eslint-disable no-new */
 new Vue({

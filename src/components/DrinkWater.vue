@@ -1,45 +1,300 @@
-/* eslint-disable */
 <template>
-  <div class="drink-water-container">
+  <div class="drink-water-container" v-loading="loading">
     <h1>
       {{title}}
     </h1>
-    <p>每天需要喝2L的水</p>
+    <p>每天需要喝<span class="hightlight"> 2000ML </span>的水</p>
     <p>从现在开始记录你每天的喝水数量吧！看看达没达标！</p>
-    <div class="user-name">
+    <div class="drink-water-user-name content-line">
       <span>请输入你的用户名：</span>
-      <Button type="primary">Primary</Button>
-      <!-- <Input v-model="userName" placeholder="请输入user name" class="user-name-content"></Input> -->
-      <!-- <el-input v-model="userName" placeholder="请输入user name" class="user-name-content" prefix-icon="el-icon-tickets"></el-input> -->
+      <el-input v-model="userName" placeholder="请输入user name" class="user-name-content" prefix-icon="el-icon-tickets" size="mini" @blur="handleChangeName"></el-input>
     </div>
-    <div class="cup-capacity">
+    <div class="drink-water-cup-capacity content-line">
       <span>设置你的每杯水的容量：</span>
-      <!-- <el-input v-model="cupCapacity" placeholder="请输入内容" class="cup-capacity-number" prefix-icon="el-icon-edit"></el-input> -->
+      <el-input-number v-model="cupCapacity" class="cup-capacity-number" :min="1" :max="2000" :step="10" @change="handleChangeCupCapacity" size="mini"></el-input-number>
       <span>ML</span>
     </div>
+    <div class="water-container content-line">
+      <div class="img-container">
+        <img src="../assets/cup1.png" alt="" class="water-img">
+      </div>
+      <div class="water-right">
+        <p class="today-drink">今天是： <span class="underline">{{today.CNtoday}}</span> </p>
+        <p class="today-drink">今天已经喝了 <span class="underline">{{totalCupNumber}}</span>  杯</p>
+        <p class="today-drink">总共 <span class="underline">{{totalDrinkWater}}</span>  ML</p>
+        <p v-show="!reachStandard" class="today-drink">还差 <span class="hightlight underline">{{2000 - totalDrinkWater}}</span> ML</p>
+        <p v-show="reachStandard" class="today-drink reach-standard">达标啦！</p>
+        <div>
+          <button class="add-cup-of-water cup-button" @click="addOneCupWater">喝一杯</button>
+          <button class="sub-cup-of-water cup-button" @click="subOneCupWater">减一杯</button>
+        </div>
+      </div>
+    </div>
+    <el-dialog
+      title="提示"
+      :visible.sync="centerDialogVisible"
+      width="60%"
+      center>
+      <span>请输入用户名!用户名不能为空！</span>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="centerDialogVisible = false">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
 <script>
+import tools from '../commom/tools'
+const drinkDomain = 'http://localhost:9998/drinkwater'
+const getUserDataAPI = '/getdata'
+const initUserDataAPI = '/initdata'
+const setUserDataApi = '/setdata'
+
 export default {
   name: 'DrinkWater',
   data () {
     return {
       title: 'You need drink WATER!',
-      cupCapacity: 80,
-      userName: 'xjw'
+      today: {},
+      cupCapacity: 100,
+      userName: '',
+      totalDrinkWater: 0,
+      totalCupNumber: 0,
+      centerDialogVisible: false,
+      isFirstUser: false,
+      alertNewUser: false,
+      loading: false
+    }
+  },
+  computed: {
+    reachStandard () {
+      if (this.totalDrinkWater >= 2000) {
+        return true
+      } else {
+        return false
+      }
+    }
+  },
+  created () {
+    this.today = tools.GetToday()
+  },
+  methods: {
+    handleChangeName () {
+      console.log('change userName')
+      console.log(this.userName)
+      console.log(this.$axios)
+      this.loading = true
+      this.$axios.get(drinkDomain + getUserDataAPI, {
+        params: {
+          username: this.userName,
+          date: 'd' + this.today.date
+        }
+      }).then((data) => {
+        this.loading = false
+        console.log('get name data', data)
+        if (data.data.data) {
+          // 不是第一次
+          let userData = data.data.data
+          this.cupCapacity = userData.cup_capacity
+          this.userName = userData.userName
+          this.totalDrinkWater = userData.total_drink_water
+          this.totalCupNumber = userData.total_cup_number
+        } else {
+          this.isFirstUser = true
+        }
+      })
+    },
+    handleChangeCupCapacity () {
+      console.log('change cupCapacity')
+      console.log(this.cupCapacity)
+    },
+    addOneCupWater () {
+      console.log('this.isFirstUser', this.isFirstUser)
+
+      if (!this.userName) {
+        this.centerDialogVisible = true
+      } else {
+        if (this.isFirstUser) {
+          this.$confirm('是否创建新的用户？', '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+          }).then(() => {
+            this.$message({
+              type: 'success',
+              message: '创建新用户'
+            })
+            // 初始化
+            this.$axios.get(drinkDomain + initUserDataAPI, {
+              params: {
+                username: this.userName,
+                date: 'd' + this.today.date,
+                cup_capacity: this.cupCapacity
+              }
+            }).then((data) => {
+              this.isFirstUser = false
+              this.totalDrinkWater += this.cupCapacity
+              this.totalCupNumber += 1
+            })
+          }).catch(() => {
+            this.$message({
+              type: 'info',
+              message: '已取消创建'
+            })
+          })
+        } else {
+          this.$axios.get(drinkDomain + setUserDataApi, {
+            params: {
+              username: this.userName,
+              date: 'd' + this.today.date,
+              cup_capacity: this.cupCapacity,
+              operationType: 'add'
+            }
+          }).then((data) => {
+            this.totalDrinkWater += this.cupCapacity
+            this.totalCupNumber += 1
+          })
+        }
+      }
+    },
+    subOneCupWater () {
+      if (!this.userName) {
+        this.centerDialogVisible = true
+      } else {
+        if (this.totalDrinkWater === 0) return
+        this.totalDrinkWater -= this.cupCapacity
+        this.totalCupNumber -= 1
+      }
     }
   }
 }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped lang="stylus">
-.drink-water-container
-  .cup-capacity
-    .cup-capacity-number
-      width 100px
-  .user-name
-    .user-name-content
-      width 100px
+<style rel="stylesheet/stylus" lang="stylus">
+.drink-water-container {
+  margin: 0 auto;
+  width: 50%;
+  min-width: 400px;
+  height: 100%;
+
+  .hightlight {
+    color: red;
+    font-size: 20px;
+  }
+
+  .underline {
+    text-decoration: underline;
+  }
+
+  .content-line {
+    margin: 10px;
+  }
+
+  .drink-water-user-name {
+    .user-name-content {
+      width: 100px;
+    }
+  }
+
+  .drink-water-cup-capacity {
+    .cup-capacity-number {
+      width: 100px;
+    }
+  }
+
+  .water-container {
+    display: flex;
+    width: 100%;
+    text-align: left;
+
+    .img-container {
+      width: 30%;
+
+      .water-img {
+        margin-left: 20px;
+        width: 100%;
+      }
+    }
+
+    .water-right {
+      flex: 1;
+      margin: 10px 40px;
+
+      .today-drink {
+        margin-left: 10px;
+      }
+
+      .reach-standard {
+        font-size: 20px;
+        font-weight: bold;
+        color: red;
+      }
+
+      .cup-button {
+        position: relative;
+        color: rgba(255, 255, 255, 1);
+        text-decoration: none;
+        background-color: rgba(219, 87, 5, 1);
+        border-color: rgba(219, 87, 5, 1);
+        font-family: 'Yanone Kaffeesatz';
+        font-weight: 700;
+        font-size: 3em;
+        display: block;
+        padding: 4px;
+        -webkit-border-radius: 8px;
+        -moz-border-radius8px;
+        border-radius: 8px;
+        -webkit-box-shadow: 0px 9px 0px rgba(219, 31, 5, 1), 0px 9px 25px rgba(0, 0, 0, 0.7);
+        -moz-box-shadow: 0px 9px 0px rgba(219, 31, 5, 1), 0px 9px 25px rgba(0, 0, 0, 0.7);
+        box-shadow: 0px 9px 0px rgba(219, 31, 5, 1), 0px 9px 25px rgba(0, 0, 0, 0.7);
+        margin: 20px auto;
+        width: 160px;
+        text-align: center;
+        -webkit-transition: all 0.1s ease;
+        -moz-transition: all 0.1s ease;
+        -ms-transitionall: 0.1s ease;
+        -o-transition: all 0.1s ease;
+        transition: all 0.1s ease;
+        user-selectnone;
+        cursor: pointer;
+
+        &:active {
+          -webkit-box-shadow: 0px 3px 0px rgba(219, 31, 5, 1), 0px 3px 6px rgba(0, 0, 0, 0.9);
+          -moz-box-shadow: 0px 3px 0px rgba(219, 31, 5, 1), 0px 3px 6px rgba(0, 0, 0, 0.9);
+          box-shadow: 0px 3px 0px rgba(219, 31, 5, 1), 0px 3px 6px rgba(0, 0, 0, 0.9);
+          position: relative;
+          top: 6px;
+        }
+
+        &:focus {
+          outline: none;
+        }
+      }
+
+      .sub-cup-of-water {
+        margin: 20px auto;
+        width: 80px;
+        font-size: 1rem;
+        background-color: #7bbfea;
+        border-color: #7bbfea;
+        -webkit-box-shadow: 0px 9px 0px #33a3dc, 0px 9px 25px rgba(0, 0, 0, 0.7);
+        -moz-box-shadow: 0px 9px 0px #33a3dc, 0px 9px 25px rgba(0, 0, 0, 0.7);
+        box-shadow: 0px 9px 0px #33a3dc, 0px 9px 25px rgba(0, 0, 0, 0.7);
+
+        &:active {
+          -webkit-box-shadow: 0px 3px 0px #33a3dc, 0px 3px 6px rgba(0, 0, 0, 0.9);
+          -moz-box-shadow: 0px 3px 0px #33a3dc, 0px 3px 6px rgba(0, 0, 0, 0.9);
+          box-shadow: 0px 3px 0px #33a3dc, 0px 3px 6px rgba(0, 0, 0, 0.9);
+          position: relative;
+          top: 6px;
+        }
+      }
+    }
+  }
+
+  .alert-new-user {
+    width 50%
+  }
+}
 </style>
