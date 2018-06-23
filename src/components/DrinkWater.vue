@@ -35,7 +35,7 @@
         </div>
       </div>
     </div>
-    <el-dialog title="设置用户名" :visible.sync="isSetUserName" :before-close="handleUserNameClose">
+    <el-dialog title="设置用户名" :visible.sync="isSetUserName" :before-close="handleUserNameClose" width="70%">
        <div class="drink-water-user-name content-line">
         <span>请输入你的用户名：</span>
         <el-input v-model="userName" placeholder="请输入user name" class="user-name-content" prefix-icon="el-icon-tickets" size="mini"></el-input>
@@ -47,7 +47,7 @@
     <el-dialog
       title="提示"
       :visible.sync="centerDialogVisible"
-      width="60%"
+      width="70%"
       center>
       <span>请输入用户名!用户名不能为空！</span>
       <span slot="footer" class="dialog-footer">
@@ -97,7 +97,8 @@ export default {
     handleUserNameClose () {
       if (!this.userName) {
         this.$alert('请输入用户名', '警告', {
-          confirmButtonText: '确定'
+          confirmButtonText: '确定',
+          center: true
         })
       } else {
         this.handleChangeName()
@@ -177,7 +178,9 @@ export default {
       this.$confirm('是否创建新的用户？', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
-        type: 'warning'
+        type: 'warning',
+        center: true,
+        showClose: false
       }).then(() => {
         this.$message({
           type: 'success',
@@ -208,6 +211,9 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style rel="stylesheet/stylus" lang="stylus">
+.el-message-box {
+    width: 70%;
+}
 .drink-water-container {
   margin: 0 auto;
   width: 50%;
@@ -221,6 +227,7 @@ export default {
 
   .underline {
     text-decoration: underline;
+    font-weight: bold;
   }
 
   .content-line {
@@ -258,7 +265,7 @@ export default {
 
     .water-right {
       flex: 1;
-      margin: 10px 40px;
+      margin: 10px 36px;
 
       .today-drink {
         margin-left: 10px;
@@ -275,7 +282,7 @@ export default {
         color: rgba(255, 255, 255, 1);
         text-decoration: none;
         background-color: rgba(219, 87, 5, 1);
-        border-color: rgba(219, 87, 5, 1);
+        border: 1px solid rgba(219, 87, 5, 1);
         font-family: 'Yanone Kaffeesatz';
         font-weight: 700;
         font-size: 3em;
@@ -284,9 +291,9 @@ export default {
         -webkit-border-radius: 8px;
         -moz-border-radius8px;
         border-radius: 8px;
-        -webkit-box-shadow: 0px 9px 0px rgba(219, 31, 5, 1), 0px 9px 25px rgba(0, 0, 0, 0.7);
-        -moz-box-shadow: 0px 9px 0px rgba(219, 31, 5, 1), 0px 9px 25px rgba(0, 0, 0, 0.7);
-        box-shadow: 0px 9px 0px rgba(219, 31, 5, 1), 0px 9px 25px rgba(0, 0, 0, 0.7);
+        -webkit-box-shadow: 0px 9px 0px rgba(219, 31, 5, 1), 0px 9px 25px rgba(219, 31, 5, 1);
+        -moz-box-shadow: 0px 9px 0px rgba(219, 31, 5, 1), 0px 9px 25px rgba(219, 31, 5, 1);
+        box-shadow: 0px 9px 0px rgba(219, 31, 5, 1), 0px 9px 25px rgba(219, 31, 5, 1);
         margin: 20px auto;
         width: 160px;
         text-align: center;
@@ -317,9 +324,9 @@ export default {
         font-size: 1rem;
         background-color: #7bbfea;
         border-color: #7bbfea;
-        -webkit-box-shadow: 0px 9px 0px #33a3dc, 0px 9px 25px rgba(0, 0, 0, 0.7);
-        -moz-box-shadow: 0px 9px 0px #33a3dc, 0px 9px 25px rgba(0, 0, 0, 0.7);
-        box-shadow: 0px 9px 0px #33a3dc, 0px 9px 25px rgba(0, 0, 0, 0.7);
+        -webkit-box-shadow: 0px 9px 0px #33a3dc, 0px 9px 25px rgba(51, 163, 220, 0.7);
+        -moz-box-shadow: 0px 9px 0px #33a3dc, 0px 9px 25px rgba(51, 163, 220, 0.7);
+        box-shadow: 0px 9px 0px #33a3dc, 0px 9px 25px rgba(51, 163, 220, 0.7);
 
         &:active {
           -webkit-box-shadow: 0px 3px 0px #33a3dc, 0px 3px 6px rgba(0, 0, 0, 0.9);
