@@ -76,6 +76,7 @@ export default {
       totalCupNumber: 0,
       centerDialogVisible: false,
       isFirstUser: false,
+      firstType: false,
       alertNewUser: false,
       loading: false,
       isSetUserName: true
@@ -124,7 +125,11 @@ export default {
           this.totalDrinkWater = userData.total_drink_water
           this.totalCupNumber = userData.total_cup_number
         } else {
-          this.isFirstUser = true
+          if (parseInt(data.data.errno) === 1) {
+            this.firstType = 'firstUser'
+          } else {
+            this.firstType = 'firstDate'
+          }
         }
       })
     },
@@ -133,7 +138,7 @@ export default {
       console.log(this.cupCapacity)
     },
     addOneCupWater () {
-      if (this.isFirstUser) {
+      if (this.firstType) {
         this.createNewUser()
       } else {
         this.setUserData('add')
@@ -175,7 +180,10 @@ export default {
       })
     },
     createNewUser () {
-      this.$confirm('是否创建新的用户？', '提示', {
+      let msg1 = '当前为新用户，是否创建？'
+      let msg2 = '当前为用户今天的新数据，是否创建？'
+      let msg = this.firstType === 'firstUser' ? msg1 : msg2
+      this.$confirm(msg, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning',
@@ -184,7 +192,7 @@ export default {
       }).then(() => {
         this.$message({
           type: 'success',
-          message: '创建新用户'
+          message: '创建成功'
         })
         // 初始化
         this.$axios.get(drinkDomain + initUserDataAPI, {
@@ -211,8 +219,8 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style rel="stylesheet/stylus" lang="stylus">
-.el-message-box {
-    width: 70%;
+body > div.el-message-box__wrapper > .el-message-box {
+  width: 70%;
 }
 .drink-water-container {
   margin: 0 auto;
