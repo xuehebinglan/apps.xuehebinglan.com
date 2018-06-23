@@ -75,7 +75,6 @@ export default {
       totalDrinkWater: 0,
       totalCupNumber: 0,
       centerDialogVisible: false,
-      isFirstUser: false,
       firstType: false,
       alertNewUser: false,
       loading: false,
@@ -145,7 +144,7 @@ export default {
       }
     },
     subOneCupWater () {
-      if (this.isFirstUser) {
+      if (this.firstType) {
         this.createNewUser()
       } else {
         if (this.totalCupNumber === 0) {
@@ -202,7 +201,7 @@ export default {
             cup_capacity: this.cupCapacity
           }
         }).then((data) => {
-          this.isFirstUser = false
+          this.firstType = false
           this.totalDrinkWater += this.cupCapacity
           this.totalCupNumber += 1
         })
