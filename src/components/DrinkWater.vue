@@ -5,10 +5,15 @@
     </h1>
     <p>每天需要喝<span class="hightlight"> 2000ML </span>的水</p>
     <p>从现在开始记录你每天的喝水数量吧！看看达没达标！</p>
-    <div class="drink-water-user-name content-line">
+    <!-- <div class="drink-water-user-name content-line">
       <span>请输入你的用户名：</span>
       <el-input v-model="userName" placeholder="请输入user name" class="user-name-content" prefix-icon="el-icon-tickets" size="mini" @blur="handleChangeName"></el-input>
+    </div> -->
+    <div class="drink-water-user-name content-line">
+      <span>用户名：</span>
+      <span class="underline">{{userName}}</span>
     </div>
+
     <div class="drink-water-cup-capacity content-line">
       <span>设置你的每杯水的容量：</span>
       <el-input-number v-model="cupCapacity" class="cup-capacity-number" :min="1" :max="2000" :step="10" @change="handleChangeCupCapacity" size="mini"></el-input-number>
@@ -30,6 +35,15 @@
         </div>
       </div>
     </div>
+    <el-dialog title="设置用户名" :visible.sync="isSetUserName" :before-close="handleUserNameClose">
+       <div class="drink-water-user-name content-line">
+        <span>请输入你的用户名：</span>
+        <el-input v-model="userName" placeholder="请输入user name" class="user-name-content" prefix-icon="el-icon-tickets" size="mini"></el-input>
+      </div>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="handleUserNameClose">确 定</el-button>
+      </div>
+    </el-dialog>
     <el-dialog
       title="提示"
       :visible.sync="centerDialogVisible"
@@ -63,7 +77,8 @@ export default {
       centerDialogVisible: false,
       isFirstUser: false,
       alertNewUser: false,
-      loading: false
+      loading: false,
+      isSetUserName: true
     }
   },
   computed: {
@@ -79,10 +94,18 @@ export default {
     this.today = tools.GetToday()
   },
   methods: {
+    handleUserNameClose () {
+      if (!this.userName) {
+        this.$alert('请输入用户名', '警告', {
+          confirmButtonText: '确定'
+        })
+      } else {
+        this.handleChangeName()
+        this.isSetUserName = false
+      }
+    },
     handleChangeName () {
       console.log('change userName')
-      console.log(this.userName)
-      console.log(this.$axios)
       this.loading = true
       this.$axios.get(drinkDomain + getUserDataAPI, {
         params: {
@@ -96,7 +119,7 @@ export default {
           // 不是第一次
           let userData = data.data.data
           this.cupCapacity = userData.cup_capacity
-          this.userName = userData.userName
+          this.userName = userData.user_name
           this.totalDrinkWater = userData.total_drink_water
           this.totalCupNumber = userData.total_cup_number
         } else {
@@ -109,62 +132,75 @@ export default {
       console.log(this.cupCapacity)
     },
     addOneCupWater () {
-      console.log('this.isFirstUser', this.isFirstUser)
-
-      if (!this.userName) {
-        this.centerDialogVisible = true
+      if (this.isFirstUser) {
+        this.createNewUser()
       } else {
-        if (this.isFirstUser) {
-          this.$confirm('是否创建新的用户？', '提示', {
-            confirmButtonText: '确定',
-            cancelButtonText: '取消',
-            type: 'warning'
-          }).then(() => {
-            this.$message({
-              type: 'success',
-              message: '创建新用户'
-            })
-            // 初始化
-            this.$axios.get(drinkDomain + initUserDataAPI, {
-              params: {
-                username: this.userName,
-                date: 'd' + this.today.date,
-                cup_capacity: this.cupCapacity
-              }
-            }).then((data) => {
-              this.isFirstUser = false
-              this.totalDrinkWater += this.cupCapacity
-              this.totalCupNumber += 1
-            })
-          }).catch(() => {
-            this.$message({
-              type: 'info',
-              message: '已取消创建'
-            })
-          })
-        } else {
-          this.$axios.get(drinkDomain + setUserDataApi, {
-            params: {
-              username: this.userName,
-              date: 'd' + this.today.date,
-              cup_capacity: this.cupCapacity,
-              operationType: 'add'
-            }
-          }).then((data) => {
-            this.totalDrinkWater += this.cupCapacity
-            this.totalCupNumber += 1
-          })
-        }
+        this.setUserData('add')
       }
     },
     subOneCupWater () {
-      if (!this.userName) {
-        this.centerDialogVisible = true
+      if (this.isFirstUser) {
+        this.createNewUser()
       } else {
-        if (this.totalDrinkWater === 0) return
-        this.totalDrinkWater -= this.cupCapacity
-        this.totalCupNumber -= 1
+        if (this.totalCupNumber === 0) {
+          this.$alert('不能更少了哦', '警告', {
+            confirmButtonText: '确定'
+          })
+        } else {
+          this.setUserData('sub')
+        }
       }
+    },
+    setUserData (operationType) {
+      this.$axios.get(drinkDomain + setUserDataApi, {
+        params: {
+          username: this.userName,
+          date: 'd' + this.today.date,
+          cup_capacity: this.cupCapacity,
+          operation_type: operationType
+        }
+      }).then((data) => {
+        console.log('setUserData')
+        console.log(data)
+        if (operationType === 'add') {
+          this.totalDrinkWater += this.cupCapacity
+          this.totalCupNumber += 1
+        } else if (operationType === 'sub') {
+          console.log('sub')
+          this.totalDrinkWater = data.data['d' + this.today.date].total_drink_water
+          this.cupCapacity = data.data['d' + this.today.date].cup_capacity
+          this.totalCupNumber -= 1
+        }
+      })
+    },
+    createNewUser () {
+      this.$confirm('是否创建新的用户？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.$message({
+          type: 'success',
+          message: '创建新用户'
+        })
+        // 初始化
+        this.$axios.get(drinkDomain + initUserDataAPI, {
+          params: {
+            username: this.userName,
+            date: 'd' + this.today.date,
+            cup_capacity: this.cupCapacity
+          }
+        }).then((data) => {
+          this.isFirstUser = false
+          this.totalDrinkWater += this.cupCapacity
+          this.totalCupNumber += 1
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消创建'
+        })
+      })
     }
   }
 }
@@ -192,14 +228,17 @@ export default {
   }
 
   .drink-water-user-name {
+    width 100%
     .user-name-content {
-      width: 100px;
+      width: 60%;
+      // min-width 100px
     }
   }
 
   .drink-water-cup-capacity {
     .cup-capacity-number {
       width: 100px;
+      max-width 200px
     }
   }
 
