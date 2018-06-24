@@ -4,6 +4,9 @@
       My Apps
     </h1>
     this is homepage.
+    <div>
+      <router-link to="/drink-water">喝水吧</router-link>
+    </div>
   </div>
 </template>
 

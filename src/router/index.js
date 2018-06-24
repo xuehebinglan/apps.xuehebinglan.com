@@ -11,12 +11,18 @@ export default new Router({
     {
       path: '/',
       name: 'HomePage',
-      component: HomePage
+      component: HomePage,
+      meta: {
+        title: '雪河冰兰的apps首页'
+      }
     },
     {
       path: '/drink-water',
       name: 'DrinkWater',
-      component: DrinkWater
+      component: DrinkWater,
+      meta: {
+        title: '喝水吧'
+      }
     }
   ]
 })
