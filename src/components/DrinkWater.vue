@@ -59,7 +59,7 @@
 
 <script>
 import tools from '../commom/tools'
-const drinkDomain = 'http://localhost:9998/drinkwater'
+const drinkDomain = 'http://api.xuehebinglan.com/drinkwater'
 const getUserDataAPI = '/getdata'
 const initUserDataAPI = '/initdata'
 const setUserDataApi = '/setdata'
