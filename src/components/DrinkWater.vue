@@ -3,12 +3,8 @@
     <h1>
       {{title}}
     </h1>
-    <p>每天需要喝<span class="hightlight"> 2000ML </span>的水</p>
-    <p>从现在开始记录你每天的喝水数量吧！看看达没达标！</p>
-    <!-- <div class="drink-water-user-name content-line">
-      <span>请输入你的用户名：</span>
-      <el-input v-model="userName" placeholder="请输入user name" class="user-name-content" prefix-icon="el-icon-tickets" size="mini" @blur="handleChangeName"></el-input>
-    </div> -->
+    <p class="content-line">每天需要喝<span class="hightlight"> 2000ML </span>的水</p>
+    <p class="content-line">从现在开始记录你每天的喝水数量吧！看看达没达标！</p>
     <div class="drink-water-user-name content-line">
       <span>用户名：</span>
       <span class="underline">{{userName}}</span>
@@ -35,7 +31,7 @@
         </div>
       </div>
     </div>
-    <el-dialog title="设置用户名" :visible.sync="isSetUserName" :before-close="handleUserNameClose" width="70%">
+    <el-dialog title="设置用户名" :visible.sync="isSetUserName" :before-close="handleUserNameClose" width="70%" max-width="400px">
        <div class="drink-water-user-name content-line">
         <span>请输入你的用户名：</span>
         <el-input v-model="userName" placeholder="请输入user name" class="user-name-content" prefix-icon="el-icon-tickets" size="mini"></el-input>
@@ -219,128 +215,133 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style rel="stylesheet/stylus" lang="stylus">
 body > div.el-message-box__wrapper > .el-message-box {
-  width: 70%;
+  width 70%
+  max-width 400px
+}
+#app > div > div:nth-child(7) > .el-dialog {
+  max-width 400px
 }
 .drink-water-container {
-  margin: 0 auto;
-  width: 50%;
-  min-width: 400px;
-  height: 100%;
+  margin 0 auto
+  width 50%
+  min-width 400px
+  height 100%
 
   .hightlight {
-    color: red;
-    font-size: 20px;
+    color red
+    font-size 20px
   }
 
   .underline {
-    text-decoration: underline;
-    font-weight: bold;
+    text-decoration underline
+    font-weight bold
   }
 
   .content-line {
-    margin: 10px;
+    margin 10px auto
+    max-width 400px
   }
 
   .drink-water-user-name {
     width 100%
     .user-name-content {
-      width: 60%;
-      // min-width 100px
+      margin-top 10px
+      width 60%
     }
   }
 
   .drink-water-cup-capacity {
     .cup-capacity-number {
-      width: 100px;
+      width 100px
       max-width 200px
     }
   }
 
   .water-container {
-    display: flex;
-    width: 100%;
-    text-align: left;
+    display flex
+    width 100%
+    text-align left
 
     .img-container {
-      width: 30%;
+      width 30%
 
       .water-img {
-        margin-left: 20px;
-        width: 100%;
+        margin-left 20px
+        width 100%
       }
     }
 
     .water-right {
-      flex: 1;
-      margin: 10px 36px;
+      flex 1
+      margin 10px 36px
 
       .today-drink {
-        margin-left: 10px;
+        margin-left 10px
       }
 
       .reach-standard {
-        font-size: 20px;
-        font-weight: bold;
-        color: red;
+        font-size 20px
+        font-weight bold
+        color red
       }
 
       .cup-button {
-        position: relative;
-        color: rgba(255, 255, 255, 1);
-        text-decoration: none;
-        background-color: rgba(219, 87, 5, 1);
-        border: 1px solid rgba(219, 87, 5, 1);
-        font-family: 'Yanone Kaffeesatz';
-        font-weight: 700;
-        font-size: 3em;
-        display: block;
-        padding: 4px;
-        -webkit-border-radius: 8px;
-        -moz-border-radius8px;
-        border-radius: 8px;
-        -webkit-box-shadow: 0px 9px 0px rgba(219, 31, 5, 1), 0px 9px 25px rgba(219, 31, 5, 1);
-        -moz-box-shadow: 0px 9px 0px rgba(219, 31, 5, 1), 0px 9px 25px rgba(219, 31, 5, 1);
-        box-shadow: 0px 9px 0px rgba(219, 31, 5, 1), 0px 9px 25px rgba(219, 31, 5, 1);
-        margin: 20px auto;
-        width: 160px;
-        text-align: center;
-        -webkit-transition: all 0.1s ease;
-        -moz-transition: all 0.1s ease;
-        -ms-transitionall: 0.1s ease;
-        -o-transition: all 0.1s ease;
-        transition: all 0.1s ease;
-        user-selectnone;
-        cursor: pointer;
+        position relative
+        color rgba(255, 255, 255, 1)
+        text-decoration none
+        background-color rgba(219, 87, 5, 1)
+        border 1px solid rgba(219, 87, 5, 1)
+        font-family 'Yanone Kaffeesatz'
+        font-weight 700
+        font-size 3em
+        display block
+        padding 4px
+        -webkit-border-radius 8px
+        -moz-border-radius8px
+        border-radius 8px
+        -webkit-box-shadow 0px 9px 0px rgba(219, 31, 5, 1), 0px 9px 25px rgba(219, 31, 5, 1)
+        -moz-box-shadow 0px 9px 0px rgba(219, 31, 5, 1), 0px 9px 25px rgba(219, 31, 5, 1)
+        box-shadow 0px 9px 0px rgba(219, 31, 5, 1), 0px 9px 25px rgba(219, 31, 5, 1)
+        margin 20px auto
+        width 160px
+        text-align center
+        -webkit-transition all 0.1s ease
+        -moz-transition all 0.1s ease
+        -ms-transitionall 0.1s ease
+        -o-transition all 0.1s ease
+        transition all 0.1s ease
+        user-selectnone
+        cursor pointer
 
         &:active {
-          -webkit-box-shadow: 0px 3px 0px rgba(219, 31, 5, 1), 0px 3px 6px rgba(0, 0, 0, 0.9);
-          -moz-box-shadow: 0px 3px 0px rgba(219, 31, 5, 1), 0px 3px 6px rgba(0, 0, 0, 0.9);
-          box-shadow: 0px 3px 0px rgba(219, 31, 5, 1), 0px 3px 6px rgba(0, 0, 0, 0.9);
-          position: relative;
-          top: 6px;
+          -webkit-box-shadow 0px 3px 0px rgba(219, 31, 5, 1), 0px 3px 6px rgba(0, 0, 0, 0.9)
+          -moz-box-shadow 0px 3px 0px rgba(219, 31, 5, 1), 0px 3px 6px rgba(0, 0, 0, 0.9)
+          box-shadow 0px 3px 0px rgba(219, 31, 5, 1), 0px 3px 6px rgba(0, 0, 0, 0.9)
+          position relative
+          top 6px
         }
 
         &:focus {
-          outline: none;
+          outline none
         }
       }
 
       .sub-cup-of-water {
-        margin: 20px auto;
-        width: 80px;
-        font-size: 1rem;
-        background-color: #7bbfea;
-        border-color: #7bbfea;
-        -webkit-box-shadow: 0px 9px 0px #33a3dc, 0px 9px 25px rgba(51, 163, 220, 0.7);
-        -moz-box-shadow: 0px 9px 0px #33a3dc, 0px 9px 25px rgba(51, 163, 220, 0.7);
-        box-shadow: 0px 9px 0px #33a3dc, 0px 9px 25px rgba(51, 163, 220, 0.7);
+        margin 20px auto
+        width 80px
+        font-size 1rem
+        background-color #7bbfea
+        border-color #7bbfea
+        -webkit-box-shadow 0px 9px 0px #33a3dc, 0px 9px 25px rgba(51, 163, 220, 0.7)
+        -moz-box-shadow 0px 9px 0px #33a3dc, 0px 9px 25px rgba(51, 163, 220, 0.7)
+        box-shadow 0px 9px 0px #33a3dc, 0px 9px 25px rgba(51, 163, 220, 0.7)
 
         &:active {
-          -webkit-box-shadow: 0px 3px 0px #33a3dc, 0px 3px 6px rgba(0, 0, 0, 0.9);
-          -moz-box-shadow: 0px 3px 0px #33a3dc, 0px 3px 6px rgba(0, 0, 0, 0.9);
-          box-shadow: 0px 3px 0px #33a3dc, 0px 3px 6px rgba(0, 0, 0, 0.9);
-          position: relative;
-          top: 6px;
+          -webkit-box-shadow 0px 3px 0px #33a3dc, 0px 3px 6px rgba(0, 0, 0, 0.9)
+          -moz-box-shadow 0px 3px 0px #33a3dc, 0px 3px 6px rgba(0, 0, 0, 0.9)
+          box-shadow 0px 3px 0px #33a3dc, 0px 3px 6px rgba(0, 0, 0, 0.9)
+          position relative
+          top 6px
         }
       }
     }
